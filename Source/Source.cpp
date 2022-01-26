@@ -143,17 +143,17 @@ namespace TASK522
 			m_pOutput = pOutput;
 		};
 
-		~AsyncAction_1()
+		/*~AsyncAction_1()
 		{
 			m_pOutput = nullptr;
-		};
+		};*/
 
 		virtual void Call()
 		{
 			for (size_t i = 0; i < 100u; ++i)
 			{
 				std::ostringstream os;
-				os << "Test1 #" << (i + 1);
+				os << "Test1 #" << (i + 1) << std::endl;
 				m_pOutput->LogLine(os.str().c_str());
 			};
 		};
@@ -172,17 +172,17 @@ namespace TASK522
 			m_pOutput = pOutput;
 		};
 
-		virtual ~AsyncAction_0()
+		/*virtual ~AsyncAction_0()
 		{
 			m_pOutput = nullptr;
-		};
+		};*/
 
 		void Call()
 		{
 			for (size_t i = 0; i < 1000u; ++i)
 			{
 				std::ostringstream os;
-				os << "Test2 #" << (i + 1);
+				os << "Test2 #" << (i + 1) << std::endl;
 				m_pOutput->LogLine(os.str().c_str());
 			};
 		};
@@ -245,7 +245,7 @@ namespace TASK522
 
 		void Start()
 		{
-			AutoCriticalSection arm(m_oRM);
+			//AutoCriticalSection arm(m_oRM);
 			m_pAsyncAction1.reset(new AsyncAction_1(this, this));
 			m_pAsyncAction2.reset(new AsyncAction_0(this, this));
 		};
@@ -253,7 +253,7 @@ namespace TASK522
 	protected:
 		void Destroy()
 		{
-			AutoCriticalSection arm(m_oRM);
+			//AutoCriticalSection arm(m_oRM);
 			m_pAsyncAction1.reset();
 			m_pAsyncAction2.reset();
 		};

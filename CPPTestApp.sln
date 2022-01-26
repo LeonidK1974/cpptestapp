@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.1758
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPPTestApp", "CPPTestApp\CPPTestApp.vcxproj", "{9E9AD221-90B0-47C8-9E9A-189E7E6E34B6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Source", "Source\Source.vcxproj", "{7860A0B1-AA9F-457F-8759-AF93CE82A7D8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MySource", "Source\Source.vcxproj", "{7860A0B1-AA9F-457F-8759-AF93CE82A7D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
