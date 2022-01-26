@@ -1,4 +1,4 @@
-﻿// CPPTestApp.cpp : This file contains the 'main' function. Program execution begins and ends there.
+﻿// Source.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 /*
@@ -36,7 +36,7 @@ namespace TASK522
 	//! check last error and throws an OsError exception if res is zero
 #define TASK522_CHK_ERRNO(res)   TASK522::Check_errno(!!(res), __FILE__, __LINE__)
 
-	//! throws an OsError exception based on errno if bResult is zero
+//! throws an OsError exception based on errno if bResult is zero
 	void Assertion(bool bResult, const char* szText, const char* file, int line)
 	{
 		if (!bResult)
@@ -50,7 +50,7 @@ namespace TASK522
 	//! throws an exception is condition is false
 #define TASK522_ASSERTION(res)   TASK522::Assertion(!!(res), #res, __FILE__, __LINE__)    
 
-	//! Recursive synchronization object
+//! Recursive synchronization object
 	typedef std::recursive_mutex CriticalSection;
 
 
@@ -63,7 +63,6 @@ namespace TASK522
 	{
 	public:
 		virtual void DoCall() = 0;
-		virtual ~AsyncActionBase() = default;
 	};
 
 	/*! Implementation of an async. call
@@ -79,42 +78,36 @@ namespace TASK522
 		AsyncActionImplT(AsyncActionBase* pControl)
 			: m_pControl(pControl)
 		{
-			std::cout << "class AsyncActionImplT calls Ctor" << std::endl;
 			Create();
 		};
 
-		virtual ~AsyncActionImplT()
+		~AsyncActionImplT()
 		{
-			std::cout << "class AsyncActionImplT calls Dtor" << std::endl;
 			Destroy();
 		};
 
 	private:
 		void Create()
 		{
-			std::cout << "class AsyncActionImplT calls Create" << std::endl;
 			m_pThread.reset(new std::thread(&AsyncActionImplT::thread_proc, this));
 		};
 
 		void Destroy()
 		{
-			std::cout << "class AsyncActionImplT calls Destroy" << std::endl;
 			if (m_pThread)
 			{
-				std::cout << "class AsyncActionImplT calls thread join" << std::endl;
 				TASK522_ASSERTION(m_pThread->joinable());
 				m_pThread->join();
 				TASK522_ASSERTION(!m_pThread->joinable());
 				m_pThread = nullptr;
 			};
 		};
+
 		void thread_proc()
 		{
-			std::cout << "class AsyncActionImplT calls thread_proc" << std::endl;
 			try
 			{
-				//static_cast<T*>(this)->Call();
-				std::cout << "class AsyncActionImplT calls thread_proc try" << std::endl;
+				static_cast<T*>(this)->Call();
 				if (this->m_pControl)
 					this->m_pControl->DoCall();
 			}
@@ -129,7 +122,7 @@ namespace TASK522
 		};
 	private:
 		std::unique_ptr<std::thread>    m_pThread;
-		AsyncActionBase*                m_pControl;
+		AsyncActionBase*                     m_pControl;
 	};
 
 	//! Abstract output class
@@ -137,7 +130,6 @@ namespace TASK522
 	{
 	public:
 		virtual void LogLine(const char* szOut) = 0;
-		virtual ~LoggerBase() = default;
 	};
 
 	//! Async action
@@ -148,23 +140,20 @@ namespace TASK522
 		AsyncAction_1(LoggerBase* pOutput, AsyncActionBase* pControl)
 			: AsyncActionImplT<AsyncAction_1>(pControl)
 		{
-			std::cout << "class AsyncAction_1 calls Ctor" << std::endl;
 			m_pOutput = pOutput;
 		};
 
-		virtual ~AsyncAction_1()
+		~AsyncAction_1()
 		{
-			std::cout << "class AsyncAction_1 calls Dtor" << std::endl;
 			m_pOutput = nullptr;
 		};
 
-		void Call()
+		virtual void Call()
 		{
-			std::cout << "class AsyncAction_1 calls Call" << std::endl;
 			for (size_t i = 0; i < 100u; ++i)
 			{
 				std::ostringstream os;
-				os << "Test1 # " << (i + 1) << std::endl;
+				os << "Test1 #" << (i + 1);
 				m_pOutput->LogLine(os.str().c_str());
 			};
 		};
@@ -180,23 +169,20 @@ namespace TASK522
 		AsyncAction_0(LoggerBase* pOutput, AsyncActionBase* pControl)
 			: AsyncActionImplT<AsyncAction_0>(pControl)
 		{
-			std::cout << "class AsyncAction_0 calls Ctor" << std::endl;
 			m_pOutput = pOutput;
 		};
 
 		virtual ~AsyncAction_0()
 		{
-			std::cout << "class AsyncAction_0 calls Dtor" << std::endl;
 			m_pOutput = nullptr;
 		};
 
 		void Call()
 		{
-			std::cout << "class AsyncAction_0 calls Call" << std::endl;
 			for (size_t i = 0; i < 1000u; ++i)
 			{
 				std::ostringstream os;
-				os << "Test2 # " << (i + 1) << std::endl;
+				os << "Test2 #" << (i + 1);
 				m_pOutput->LogLine(os.str().c_str());
 			};
 		};
@@ -212,14 +198,12 @@ namespace TASK522
 			: m_pOutput(nullptr)
 			, m_oRM(oRM)
 		{
-			std::cout << "class LoggerImpl calls Ctor" << std::endl;
 			m_pOutput = fopen("result.log", "w");
 			TASK522_CHK_ERRNO(m_pOutput);
 		};
 
-		virtual ~LoggerImpl()
+		~LoggerImpl()
 		{
-			std::cout << "class LoggerImpl calls Dtor" << std::endl;
 			if (m_pOutput)
 			{
 				fclose(m_pOutput);
@@ -230,7 +214,6 @@ namespace TASK522
 		//LoggerBase
 		virtual void LogLine(const char* szOut)
 		{
-			std::cout << "class LoggerImpl calls LogLine" << std::endl;
 			AutoCriticalSection arm(m_oRM);
 			if (m_pOutput)
 			{
@@ -252,19 +235,16 @@ namespace TASK522
 			, m_pAsyncAction1(nullptr)
 			, m_pAsyncAction2(nullptr)
 		{
-			std::cout << "class MainImpl calls Ctor" << std::endl;
 			Start();
 		};
 
-		virtual ~MainImpl()
+		~MainImpl()
 		{
-			std::cout << "class MainImpl calls Dtor" << std::endl;
 			Destroy();
 		};
 
 		void Start()
 		{
-			std::cout << "class MainImpl calls Start method" << std::endl;
 			AutoCriticalSection arm(m_oRM);
 			m_pAsyncAction1.reset(new AsyncAction_1(this, this));
 			m_pAsyncAction2.reset(new AsyncAction_0(this, this));
@@ -273,7 +253,6 @@ namespace TASK522
 	protected:
 		void Destroy()
 		{
-			std::cout << "class MainImpl calls Destroy method" << std::endl;
 			AutoCriticalSection arm(m_oRM);
 			m_pAsyncAction1.reset();
 			m_pAsyncAction2.reset();
@@ -282,15 +261,15 @@ namespace TASK522
 
 		//AsyncActionBase
 		virtual void DoCall()
-		{			
-				std::cout << "class MainImpl calls DoCall method" << std::endl;
+		{
+			;
 		};
 
 	protected:
-		CriticalSection                  m_oRM;          // protects class variables
+		CriticalSection                     m_oRM;          // protects class variables
 		std::unique_ptr<AsyncAction_1>   m_pAsyncAction1;
 		std::unique_ptr<AsyncAction_0>   m_pAsyncAction2;
-		FILE*						     m_pOutput;
+		FILE*                       m_pOutput;
 	};
 };
 
@@ -312,3 +291,4 @@ int main()
 	};
 	return 0;
 };
+
