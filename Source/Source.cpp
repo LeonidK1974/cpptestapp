@@ -78,7 +78,9 @@ namespace TASK522
 		AsyncActionImplT(AsyncActionBase* pControl)
 			: m_pControl(pControl)
 		{
-			Create();
+			/*Leonid: Проблема связанна с инициализацией экземпляров std::thread в конструкторах классов.
+		    В момент вызова конструктора std::thread экземпляр класса AsyncAction_1 ещё не сконструирован полностью.*/
+			Create(); 
 		};
 
 		~AsyncActionImplT()
@@ -107,7 +109,8 @@ namespace TASK522
 		{
 			try
 			{
-				static_cast<T*>(this)->Call();
+				//Leonid: std::this_thread::sleep_for(200ms) Костыль, но лучше переписать код с использованием функтора в thread или использовать двухфазную инициализацию
+				static_cast<T*>(this)->Call(); /*Leonid: Здесь может выбрасываться исключение из-за того, что дочерний объект не полностью сконструировался*/
 				if (this->m_pControl)
 					this->m_pControl->DoCall();
 			}
@@ -143,6 +146,7 @@ namespace TASK522
 			m_pOutput = pOutput;
 		};
 
+		//Leonid: Здесь я бы убрал вообще деструктор, использовался бы деструктор по умолчанию
 		~AsyncAction_1()
 		{
 			m_pOutput = nullptr;
@@ -172,6 +176,7 @@ namespace TASK522
 			m_pOutput = pOutput;
 		};
 
+		//Leonid: Здесь я бы убрал вообще деструктор, использовался бы деструктор по умолчанию
 		virtual ~AsyncAction_0()
 		{
 			m_pOutput = nullptr;
@@ -245,7 +250,9 @@ namespace TASK522
 
 		void Start()
 		{
-			AutoCriticalSection arm(m_oRM);
+			/*Leonid: Вероятен race condition, т.к. один и тот же объект синхронизации используется для разных защищаемых ресурсов
+			Либо совсем убрать здесь критическую секцию, либо использовать другой объект синхронизации*/
+			AutoCriticalSection arm(m_oRM); 
 			m_pAsyncAction1.reset(new AsyncAction_1(this, this));
 			m_pAsyncAction2.reset(new AsyncAction_0(this, this));
 		};
@@ -253,7 +260,9 @@ namespace TASK522
 	protected:
 		void Destroy()
 		{
-			AutoCriticalSection arm(m_oRM);
+			/*Leonid: Вероятен race condition, т.к. один и тот же объект синхронизации используется для разных защищаемых ресурсов
+			Либо совсем убрать здесь критическую секцию, либо использовать другой объект синхронизации*/
+			AutoCriticalSection arm(m_oRM); 
 			m_pAsyncAction1.reset();
 			m_pAsyncAction2.reset();
 		};
@@ -266,7 +275,7 @@ namespace TASK522
 		};
 
 	protected:
-		CriticalSection                     m_oRM;          // protects class variables
+		CriticalSection                     m_oRM;          // protects class variables 
 		std::unique_ptr<AsyncAction_1>   m_pAsyncAction1;
 		std::unique_ptr<AsyncAction_0>   m_pAsyncAction2;
 		FILE*                       m_pOutput;
@@ -275,11 +284,14 @@ namespace TASK522
 
 int main()
 {
+	/*Исключения в thread_proc() здесь "не отловим".
+	Для передачи исключений между потоками, необходимо ловить их в функции потока и хранить их где - то, 
+	чтобы в дальнейшем, получить к ним доступ.*/
 	try
 	{
 		TASK522::MainImpl oApp;
 	}
-	catch (const TASK522::OsError& excpt)
+	catch (const TASK522::OsError& excpt)    
 	{
 		std::cerr << "TASK522::OsError occured: " << excpt.what();
 		return 1;
