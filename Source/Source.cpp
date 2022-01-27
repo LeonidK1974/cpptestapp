@@ -254,7 +254,7 @@ namespace TASK522
 
 		void Start()
 		{
-			//AutoCriticalSection arm(m_oRM);
+			AutoCriticalSection arm(m_1RM);
 			m_pAsyncAction1.reset(new AsyncAction_1(this, this));
 			m_pAsyncAction2.reset(new AsyncAction_0(this, this));
 		};
@@ -262,7 +262,7 @@ namespace TASK522
 	protected:
 		void Destroy()
 		{
-			//AutoCriticalSection arm(m_oRM);
+			AutoCriticalSection arm(m_1RM);
 			m_pAsyncAction1.reset();
 			m_pAsyncAction2.reset();
 		};
@@ -276,6 +276,7 @@ namespace TASK522
 
 	protected:
 		CriticalSection                     m_oRM;          // protects class variables
+		CriticalSection                     m_1RM;
 		std::unique_ptr<AsyncAction_1>   m_pAsyncAction1;
 		std::unique_ptr<AsyncAction_0>   m_pAsyncAction2;
 		FILE*                       m_pOutput;
