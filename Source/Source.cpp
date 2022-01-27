@@ -16,6 +16,7 @@
 #include <exception>
 #include <mutex>
 #include <thread>
+#include <chrono>
 
 namespace TASK522
 {
@@ -78,11 +79,13 @@ namespace TASK522
 		AsyncActionImplT(AsyncActionBase* pControl)
 			: m_pControl(pControl)
 		{
+			std::cout << "class AsyncActionImplT calls Ctor" << std::endl;
 			Create();
 		};
 
 		~AsyncActionImplT()
 		{
+			std::cout << "class AsyncActionImplT calls Dtor" << std::endl;
 			Destroy();
 		};
 
@@ -107,6 +110,7 @@ namespace TASK522
 		{
 			try
 			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(200));
 				static_cast<T*>(this)->Call();
 				if (this->m_pControl)
 					this->m_pControl->DoCall();
@@ -140,13 +144,15 @@ namespace TASK522
 		AsyncAction_1(LoggerBase* pOutput, AsyncActionBase* pControl)
 			: AsyncActionImplT<AsyncAction_1>(pControl)
 		{
+			std::cout << "class AsyncAction_1 calls Ctor" << std::endl;
 			m_pOutput = pOutput;
 		};
 
-		/*~AsyncAction_1()
-		{
-			m_pOutput = nullptr;
-		};*/
+		//~AsyncAction_1()
+		//{
+		//	std::cout << "class AsyncAction_1 calls Dtor" << std::endl;
+		//	//m_pOutput = nullptr;
+		//};
 
 		virtual void Call()
 		{
@@ -169,11 +175,13 @@ namespace TASK522
 		AsyncAction_0(LoggerBase* pOutput, AsyncActionBase* pControl)
 			: AsyncActionImplT<AsyncAction_0>(pControl)
 		{
+			std::cout << "class AsyncAction_0 calls Ctor" << std::endl;
 			m_pOutput = pOutput;
 		};
 
 		/*virtual ~AsyncAction_0()
 		{
+			std::cout << "class AsyncAction_0 calls Dtor" << std::endl;
 			m_pOutput = nullptr;
 		};*/
 
@@ -183,7 +191,7 @@ namespace TASK522
 			{
 				std::ostringstream os;
 				os << "Test2 #" << (i + 1) << std::endl;
-				m_pOutput->LogLine(os.str().c_str());
+ 				m_pOutput->LogLine(os.str().c_str());
 			};
 		};
 	protected:
@@ -204,6 +212,7 @@ namespace TASK522
 
 		~LoggerImpl()
 		{
+			std::cout << "class LoggerImpl calls Dtor" << std::endl;
 			if (m_pOutput)
 			{
 				fclose(m_pOutput);
