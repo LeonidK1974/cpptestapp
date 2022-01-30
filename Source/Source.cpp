@@ -7,13 +7,13 @@
 	Указать те ошибки в коде, которые приводят к неправильной работе программы. При этом развернуто и подробно описать, в чем каждая из таких ошибок заключается, как проявляется, к каким именно проблемам приводит. Исправлять найденные ошибки не следует.  Про артефакты, которые не приводят к неправильной работе программы, писать не следует -- за спам снимаем баллы.
 */
 
-#include <cstdio>
-#include <string>
-#include <memory>
+//#include <cstdio>
+//#include <string>
+//#include <memory>
 #include <iostream>
 #include <sstream>
-#include <fstream>
-#include <exception>
+//#include <fstream>
+//#include <exception>
 #include <mutex>
 #include <thread>
 
@@ -32,7 +32,8 @@ namespace TASK522
 			throw OsError(os.str().c_str());
 		};
 	};
-
+	
+	//Leonid: Если этот макрос использовать в ThreadProc, то в main-функции выброшенное исключение "не поймаем". Пролучим unhandled c++ exception.
 	//! check last error and throws an OsError exception if res is zero
 #define TASK522_CHK_ERRNO(res)   TASK522::Check_errno(!!(res), __FILE__, __LINE__)
 
@@ -109,7 +110,6 @@ namespace TASK522
 		{
 			try
 			{
-				//Leonid: std::this_thread::sleep_for(200ms) Костыль, но лучше переписать код с использованием функтора в thread или использовать двухфазную инициализацию
 				/*Leonid: Здесь может выбрасываться исключение из-за того, что дочерний объект не полностью сконструировался*/
 				/*Leonid: Безопаснее использовать dynamic_cast с проверкой результата конвертации*/
 				static_cast<T*>(this)->Call(); 
@@ -148,7 +148,6 @@ namespace TASK522
 			m_pOutput = pOutput;
 		};
 
-		//Leonid: Здесь я бы убрал вообще деструктор, использовался бы деструктор по умолчанию
 		~AsyncAction_1()
 		{
 			m_pOutput = nullptr;
@@ -178,7 +177,6 @@ namespace TASK522
 			m_pOutput = pOutput;
 		};
 
-		//Leonid: Здесь я бы убрал вообще деструктор, использовался бы деструктор по умолчанию
 		virtual ~AsyncAction_0()
 		{
 			m_pOutput = nullptr;
