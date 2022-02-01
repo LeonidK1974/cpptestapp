@@ -7,13 +7,13 @@
 	Указать те ошибки в коде, которые приводят к неправильной работе программы. При этом развернуто и подробно описать, в чем каждая из таких ошибок заключается, как проявляется, к каким именно проблемам приводит. Исправлять найденные ошибки не следует.  Про артефакты, которые не приводят к неправильной работе программы, писать не следует -- за спам снимаем баллы.
 */
 
-//#include <cstdio>
-//#include <string>
-//#include <memory>
+#include <cstdio>
+#include <string>
+#include <memory>
 #include <iostream>
 #include <sstream>
-//#include <fstream>
-//#include <exception>
+#include <fstream>
+#include <exception>
 #include <mutex>
 #include <thread>
 
@@ -111,7 +111,6 @@ namespace TASK522
 			try
 			{
 				/*Leonid: Здесь может выбрасываться исключение из-за того, что дочерний объект не полностью сконструировался*/
-				/*Leonid: Безопаснее использовать dynamic_cast с проверкой результата конвертации*/
 				static_cast<T*>(this)->Call(); 
 				if (this->m_pControl)
 					this->m_pControl->DoCall();
@@ -284,9 +283,7 @@ namespace TASK522
 
 int main()
 {
-	/*Leonid: Исключения в thread_proc() здесь "не отловим".
-	Для передачи исключений между потоками, необходимо ловить их в функции потока и хранить их где - то, 
-	чтобы в дальнейшем, получить к ним доступ.*/
+	//Leonid: Исключения в thread_proc() здесь "не отловим".
 	try
 	{
 		TASK522::MainImpl oApp;
